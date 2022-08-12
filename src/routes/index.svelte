@@ -21,25 +21,21 @@ const ffanimate = () =>{
         deck = shuffleDeck()
         start_reset = false
 
-        setTimeout(()=>{
             drawCard(player,"dealt")
             render_card();
-            setTimeout(()=>{
-                drawCard(dealer,"dealt",true)
-                render_card();
-                setTimeout(()=>{
-                    drawCard(player,"dealt")
-                    render_card()
-                    setTimeout(()=>{
-                        drawCard(dealer,"dealt")
-                        render_card()
-                        game_running = true
+
+            drawCard(dealer,"dealt",true)
+            render_card();
+
+            drawCard(player,"dealt")
+            render_card()
+                        
+            drawCard(dealer,"dealt")
+            render_card()
+            game_running = true
 
                         // todo: hit/sit function
-                    },400)
-                },300)
-            },400)
-        },100)
+
 }
 
 let startGame = ()=>{
