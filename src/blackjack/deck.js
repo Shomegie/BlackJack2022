@@ -20,7 +20,7 @@ let getCardFace = (face)=> {
 export let shuffleDeck = () => {
     deck=[]
     for (let i=1; i<=52; i++){
-        card = {id:i,value:getCardValue(i),face:getCardFace(i)}
+        card = {id:i,cardvalue:getCardValue(i),cardface:getCardFace(i)}
         deck.push(card)
     }
     return deck;
