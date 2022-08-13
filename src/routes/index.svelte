@@ -37,7 +37,7 @@ const ffanimate = () =>{
 
                         // todo: hit/sit function
                     },400)
-                },300)
+                },400)
             },400)
         },100)
 }
@@ -101,7 +101,16 @@ let dummy = () =>{
     cards = cards
 }
 
+$: preloadImageUrls = [...Array(52).keys()].map((key) => `/cards/${key+1}.svg`);
+
+
 </script>
+
+<svelte:head>
+    {#each preloadImageUrls as image}
+      <link rel="preload" as="image" href={image} />
+    {/each}
+</svelte:head>
 
 <div class=" board h-screen w-full relative">
     <!-- board: full screen -->
@@ -118,10 +127,11 @@ let dummy = () =>{
                         {#if game_running }
                             <div transition:fade class="bg-black absolute bottom-7 left-0 right-0 m-auto w-fit bg-opacity-10 text-opacity-60 text-teal-700 rounded-full text-xs py-1 px-4">{dealer_total}</div>
                         {/if}
-                        <div class="absolute w-fit h-full left-0 right-0 m-auto flex mt-6">
+                        <div class="absolute w-fit h-full left-0 right-0 m-auto flex mt-6 transition">
                             {#if dealer_history.length > 0}
                                 {#each dealer_history as image,i (i)}
-                                    <img src={`cards/${image.card[0].id}.svg`} class={`h-28 ${i==0?"":"-ml-14 mt-1"}`} alt={i}> 
+                                    <img in:fly={{ x: 100, y:25, duration: 500 }}
+                                    out:fly={{ x: 100, duration: 400 }} src={`cards/${image.card[0].id}.svg`} class={`h-28 ${i==0?"":"-ml-14 mt-1"}`} alt={i}> 
                                 {/each}
                             {:else}
                                 <p></p>
@@ -145,7 +155,7 @@ let dummy = () =>{
                         {#if player_history.length > 0 }
                             {#each player_history as image,i (i)}
                                 <!-- <img in:fly={{x:50,duration:1000}} animate:flip class={`h-2/3 ${i==0?"":"-ml-20"}`} src={`${image}.svg`} alt="">  -->
-                                <img in:fly={{x:50, y:-50,duration:700,easing:backOut}} class={`xl:h-44 h-40 cursor-pointer ${i==0?"":"-ml-24"} ${i==0?"-mt-2":""} ${i==3?"":""} ${i==5?"mt-2":""}`} src={`cards/${image.card[0].id}.svg`} alt={image.card[0].cardface}>
+                                <img in:fly={{x:50, y:-50,duration:700}} class={`xl:h-44 h-40 cursor-pointer ${i==0?"":"-ml-24"} ${i==0?"-mt-2":""} ${i==3?"":""} ${i==5?"mt-2":""}`} src={`cards/${image.card[0].id}.svg`} alt={image.card[0].cardface}>
                             {/each}
                         {:else}
                             <p></p>
