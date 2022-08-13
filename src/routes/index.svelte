@@ -117,7 +117,8 @@ let dummy = () =>{
                         <div class="absolute w-fit h-full left-0 right-0 m-auto flex mt-6">
                             {#if dealer_history.length > 0}
                                 {#each dealer_history as image,i (i)}
-                                    <img src={`cards/${image.card[0].id}.svg`} class={`h-28 ${i==0?"":"-ml-14 mt-1"}`} alt={i}> 
+                                    <img       in:fly={{ x: 100, duration: 400, delay: 400 }}
+                                    out:fly={{ x: 100, duration: 400 }} src={`cards/${image.card[0].id}.svg`} class={`h-28 ${i==0?"":"-ml-14 mt-1"}`} alt={i}> 
                                 {/each}
                             {:else}
                                 <p></p>
@@ -141,7 +142,8 @@ let dummy = () =>{
                         {#if player_history.length > 0 }
                             {#each player_history as image,i (i)}
                                 <!-- <img in:fly={{x:50,duration:1000}} animate:flip class={`h-2/3 ${i==0?"":"-ml-20"}`} src={`${image}.svg`} alt="">  -->
-                                <img in:fly={{x:50, y:-50,duration:700,easing:backOut}} class={`xl:h-44 h-40 cursor-pointer ${i==0?"":"-ml-24"} ${i==0?"-mt-2":""} ${i==3?"":""} ${i==5?"mt-2":""}`} src={`cards/${image.card[0].id}.svg`} alt={image.card[0].cardface}>
+                                <img       in:fly={{ x: -100, duration: 400, delay: 400 }}
+                                out:fly={{ x: 100, duration: 400 }} class={`xl:h-44 h-40 cursor-pointer ${i==0?"":"-ml-24"} ${i==0?"-mt-2":""} ${i==3?"":""} ${i==5?"mt-2":""}`} src={`cards/${image.card[0].id}.svg`} alt={image.card[0].cardface}>
                             {/each}
                         {:else}
                             <p></p>
