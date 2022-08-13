@@ -7,6 +7,11 @@ import {shuffleDeck} from '../blackjack/deck.js'
 
 let deck = shuffleDeck()
 
+
+$: preloadImageUrls = [...Array(52).keys()].map((key) => `/cards/${key+1}.svg`);
+
+
+
 let dealer = false
 let player = true
 let card_index = 0
@@ -98,6 +103,12 @@ let dummy = () =>{
 }
 
 </script>
+
+<svelte:head>
+    {#each preloadImageUrls as image}
+      <link rel="preload" as="image" href={image} />
+    {/each}
+</svelte:head>
 
 <div class=" board h-screen w-full relative">
     <!-- board: full screen -->
