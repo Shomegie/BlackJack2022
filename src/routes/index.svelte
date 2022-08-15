@@ -45,7 +45,7 @@ const startGame = () =>{
 
 }
 
-const aceHandler = (final_total, aceCount) =>{
+$: aceHandler = (final_total, aceCount) =>{
     if (aceCount >= 1){
         final_total += 10
 
@@ -76,30 +76,18 @@ const hitAction = () =>{
     }
 }
 
-let gameStatus = () =>{
 
+
+const dealerHitAction = ()=>{
+    setInterval(function (){
+        if (aceHandler(dealer_total,dealer_aceCount ) < 17) {
+        drawCard(dealer,"dealt", false , ()=>{
+            console.log(aceHandler(dealer_total,dealer_aceCount))
+        })
+        render_card()
+        }
+    }, 400);
 }
-
-// let startGame = ()=>{
-//         deck = shuffleDeck()
-//         drawCard(player,"dealt")
-//         //drawCard(dealer,"dealt")
-//         render_card()
-
-//         drawCard(player,"dealt")
-//         drawCard(dealer,"dealt")
-//         render_card()
-//         //hit_stay_state()
-//         console.log(player_history)
-// }
-
-
-
-let disp_1 = ""
-let disp_2 = ""
-let disp_3 = ""
-let disp_4 = "test"
-
 
 
 
@@ -112,7 +100,7 @@ $:dealer_total = dealer_history.reduce((sum,index)=>{
     },0)
 
 
-let drawCard = (user,action,facedown=false) => {
+let drawCard = (user,action,facedown=false,callback) => {
     card_index+=1
     let card = deck.splice(Math.floor(Math.random()*(deck.length)),1)
 
@@ -125,11 +113,19 @@ let drawCard = (user,action,facedown=false) => {
         if (card[0].cardvalue ==1) 
             dealer_aceCount +=1
     }
+
+    if (typeof callback == "function")
+        callback();
 }
 
-let render_card = ()=>{
+let render_card = (callback)=>{
     player_history = player_history
     dealer_history = dealer_history
+
+    if (typeof callback == "function")
+        callback();
+
+
 }
 
 
@@ -200,7 +196,7 @@ $: preloadImageUrls = [...Array(52).keys()].map((key) => `/cards/${key+1}.svg`);
                 </div>
                 {#if hit_stay_state}
                     <div transition:fade class="hit_stay w-fit mx-auto flex  text-xl divide-teal-900 divide-x divide-opacity-20 pb-1 font-light text-opacity-60  text-teal-600">
-                        <button class="px-5 py-1 hover:cursor-pointer group -mt-0.5 group "><div class=" text-opacity-50 border-opacity-50 border-b pb-0 transition duration-200 group-hover:border-teal-500  group-hover:border-opacity-80 group-hover:text-teal-500  group-hover:text-opacity-80 border-teal-600 ">Stay</div></button>
+                        <button class="px-5 py-1 hover:cursor-pointer group -mt-0.5 group"><div class=" text-opacity-50 border-opacity-50 border-b pb-0 transition duration-200 group-hover:border-teal-500  group-hover:border-opacity-80 group-hover:text-teal-500  group-hover:text-opacity-80 border-teal-600 " on:click={dealerHitAction}>Stay</div></button>
                         <button  class="px-6 py-1 tracking-wider cursor-pointer transition hover:text-teal-500 hover:text-opacity-90 duration-200 flex" on:click={hitAction}>Hit<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M4.293 15.707a1 1 0 010-1.414l5-5a1 1 0 011.414 0l5 5a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414 0zm0-6a1 1 0 010-1.414l5-5a1 1 0 011.414 0l5 5a1 1 0 01-1.414 1.414L10 5.414 5.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                         </svg></button>
