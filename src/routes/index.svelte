@@ -16,6 +16,50 @@ let player_aceCount = 0
 let dealer_aceCount = 0
 let game_running = false
 let hit_stay_state = false
+let player_game_eval_color = ""
+let player_game_eval_message = ""
+let player_game_eval = false
+let end_game = false
+
+
+// game eval 
+$: if (aceHandler(player_total,player_aceCount) > 21){
+    end_game = true
+    hit_stay_state = false
+    player_game_eval_color ="text-red-500"
+    player_game_eval_message = "Round loss, bust ..."
+    player_game_eval = true
+    // reveal blinder
+} else if(aceHandler(dealer_total,dealer_aceCount) == 21 && end_game ){
+    //hit_stay_state = false
+    //dealerHitAction()
+    player_game_eval_color ="text-red-500"
+    player_game_eval_message = "Round loss, dealer has blackjack"
+    player_game_eval = true
+
+} else if(aceHandler(player_total,player_aceCount) == 21 && end_game){
+    player_game_eval_color ="text-yellow-300"
+    player_game_eval_message = "Blackjack!!!"
+    player_game_eval = true
+
+} else if(aceHandler(dealer_total,dealer_aceCount) > 21 && end_game ){
+    player_game_eval_color ="text-lime-300"
+    player_game_eval_message = "Round win, dealer bust"
+    player_game_eval = true
+} else if((aceHandler(dealer_total,dealer_aceCount) == aceHandler(player_total,player_aceCount)) && end_game) {
+    player_game_eval_color ="text-amber-600"
+    player_game_eval_message = "Stalemate, payout even ..."
+    player_game_eval = true
+} else if((aceHandler(dealer_total,dealer_aceCount) > aceHandler(player_total,player_aceCount)) && end_game) {
+    player_game_eval_color ="text-red-500"
+    player_game_eval_message = `Round loss, dealer has ${aceHandler(dealer_total,dealer_aceCount)}`
+    player_game_eval = true
+}  else if((aceHandler(dealer_total,dealer_aceCount) < aceHandler(player_total,player_aceCount)) && end_game) {
+    player_game_eval_color ="text-lime-300"
+    player_game_eval_message = `Round win, dealer has ${aceHandler(dealer_total,dealer_aceCount)}`
+    player_game_eval = true
+} 
+
 
 
 let start_reset = true
@@ -55,38 +99,27 @@ $: aceHandler = (final_total, aceCount) =>{
     return final_total
 }
 
+
+
 const hitAction = () =>{
-    drawCard(player,"hit")
-    render_card()
-    gameStatus()
-    if (player_total >21){
-        // hide hit/stay buttons
-        // player busts
-        // dealer reveals card
-        // end game
-        //exit_function()
-
-    } else if(player_total == 21){
-        // blackjack achieved
-        // replace hit/stay buttons with blackjack
-        // dealer reveals card
-        // dealer hits till 17
-
-        //exit_function()
-    }
+    drawCard(player,"hit",false,()=>{
+        aceHandler(dealer_total,dealer_aceCount)
+        render_card()
+    })
 }
 
-
-
 const dealerHitAction = ()=>{
+    hit_stay_state = false
     setInterval(function (){
         if (aceHandler(dealer_total,dealer_aceCount ) < 17) {
         drawCard(dealer,"dealt", false , ()=>{
             console.log(aceHandler(dealer_total,dealer_aceCount))
         })
         render_card()
+        }else{
+            end_game = true
         }
-    }, 400);
+    }, 500);
 }
 
 
@@ -108,14 +141,15 @@ let drawCard = (user,action,facedown=false,callback) => {
         player_history.push({card: card, action: action, facedown:facedown, card_index:card_index})
         if (card[0].cardvalue ==1) 
             player_aceCount +=1
+        if (typeof callback == "function")
+        callback();
     }else{
         dealer_history.push({card: card, action: action, facedown:facedown, card_index:card_index})
         if (card[0].cardvalue ==1) 
             dealer_aceCount +=1
     }
 
-    if (typeof callback == "function")
-        callback();
+
 }
 
 let render_card = (callback)=>{
@@ -154,7 +188,7 @@ $: preloadImageUrls = [...Array(52).keys()].map((key) => `/cards/${key+1}.svg`);
                     <div class="h-2/5"></div>
                     <div class="h-3/5 relative">
                         {#if game_running }
-                            <div transition:fade class="bg-black absolute bottom-7 xl:bottom-10 left-0 right-0 m-auto w-fit bg-opacity-10 text-opacity-60 text-teal-700 rounded-full text-xs py-1 px-4">{aceHandler(dealer_total,dealer_aceCount)}</div>
+                            <div transition:fade class="bg-black absolute bottom-7 xl:bottom-10 left-0 right-0 m-auto w-fit bg-opacity-10 text-opacity-90 text-teal-700 rounded-full text-xs py-1 px-4">{aceHandler(dealer_total,dealer_aceCount)}</div>
                         {/if}
                         <div class="absolute w-fit h-full left-0 right-0 m-auto flex mt-6 transition">
                             {#if dealer_history.length > 0}
@@ -174,7 +208,15 @@ $: preloadImageUrls = [...Array(52).keys()].map((key) => `/cards/${key+1}.svg`);
 
                 </div>
             </div>
-            <div class="details w-full h-1/5 border-0 border-lime-600"></div>
+            <div class="details w-full h-1/5 border-0 border-lime-600">
+                <div class="w-full h-full flex flex-col-reverse mt-3">
+                    {#if end_game}
+                        <div transition:fade class="h-1/3 w-fit mx-auto text-amber-400 text-opacity-70 text-sm cursor-pointer flex p-2">New Game <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-0.5 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg></div>
+                    {/if}
+                </div>
+            </div>
             <div class="player w-full h-2/5 border-0 border-rose-600 p-2">
                 <div class="player_cards h-3/4 w-full flex items-center mx-auto relative ">
                     <!-- {#if game_running}
@@ -191,7 +233,12 @@ $: preloadImageUrls = [...Array(52).keys()].map((key) => `/cards/${key+1}.svg`);
                         {/if}
                     </div>
                     {#if game_running}
-                        <div transition:fade class="bg-black absolute top-52 left-0 right-0 w-fit m-auto -mt-7 xl:-mt-2 bg-opacity-10 text-opacity-70 text-teal-600 rounded-full text-sm py-0 px-4">Hand:{aceHandler(player_total,player_aceCount)}</div>
+                        <div transition:fade class="bg-black absolute top-52 left-0 right-0 w-fit m-auto -mt-7 xl:-mt-2 bg-opacity-10 text-opacity-70 text-teal-600 rounded-full text-sm py-0 px-4 flex flex-col">
+                            <div class="w-fit mx-auto">Hand:{aceHandler(player_total,player_aceCount)}</div>
+                            {#if player_game_eval}
+                                <div class={`${player_game_eval_color} w-fit mx-auto text-opacity-60`}>{player_game_eval_message}</div>
+                            {/if}
+                        </div>
                     {/if}
                 </div>
                 {#if hit_stay_state}
