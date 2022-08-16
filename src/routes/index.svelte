@@ -20,15 +20,36 @@ let player_game_eval_color = ""
 let player_game_eval_message = ""
 let player_game_eval = false
 let end_game = false
+let start_reset = true
+
+
+
+const reset_game = ()=>{
+    card_index = 0
+    dealer_history =[]
+    player_history =[]
+    player_aceCount = 0
+    dealer_aceCount = 0
+    game_running = false
+    player_game_eval_color = ""
+    player_game_eval_message = ""
+    player_game_eval = false
+    end_game = false
+    start_reset = true
+    render_card()
+}
 
 
 // game eval 
 $: if (aceHandler(player_total,player_aceCount) > 21){
-    end_game = true
-    hit_stay_state = false
-    player_game_eval_color ="text-red-500"
-    player_game_eval_message = "Round loss, bust ..."
-    player_game_eval = true
+    setTimeout(()=>{
+        end_game = true
+        hit_stay_state = false
+        player_game_eval_color ="text-red-500"
+        player_game_eval_message = "Round loss, bust ..."
+        player_game_eval = true
+    },500)
+
     // reveal blinder
 } else if(aceHandler(dealer_total,dealer_aceCount) == 21 && end_game ){
     //hit_stay_state = false
@@ -62,9 +83,12 @@ $: if (aceHandler(player_total,player_aceCount) > 21){
 
 
 
-let start_reset = true
+
+
 
 const startGame = () =>{
+    if (start_reset){
+
         deck = shuffleDeck()
         start_reset = false
 
@@ -86,6 +110,8 @@ const startGame = () =>{
                 },400)
             },400)
         },100)
+    }
+
 
 }
 
@@ -110,17 +136,19 @@ const hitAction = () =>{
 
 const dealerHitAction = ()=>{
     hit_stay_state = false
-    setInterval(function (){
+    let draw_interval = setInterval(function (){
         if (aceHandler(dealer_total,dealer_aceCount ) < 17) {
-        drawCard(dealer,"dealt", false , ()=>{
+        drawCard(dealer,"hit", false , ()=>{
             console.log(aceHandler(dealer_total,dealer_aceCount))
         })
         render_card()
         }else{
             end_game = true
+            clearInterval(draw_interval)
         }
     }, 500);
 }
+
 
 
 
@@ -211,7 +239,7 @@ $: preloadImageUrls = [...Array(52).keys()].map((key) => `/cards/${key+1}.svg`);
             <div class="details w-full h-1/5 border-0 border-lime-600">
                 <div class="w-full h-full flex flex-col-reverse mt-3">
                     {#if end_game}
-                        <div transition:fade class="h-1/3 w-fit mx-auto text-amber-400 text-opacity-70 text-sm cursor-pointer flex p-2">New Game <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-0.5 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <div transition:fade class={`h-1/3 w-fit mx-auto text-white text-opacity-70 text-sm cursor-pointer flex p-2`} on:click={reset_game}>New Game <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-0.5 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                           </svg></div>
                     {/if}
