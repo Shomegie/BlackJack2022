@@ -161,6 +161,7 @@ $:dealer_total = dealer_history.reduce((sum,index)=>{
     },0)
 
 
+// todo: write functiojality for facedown dealer card
 let drawCard = (user,action,facedown=false,callback) => {
     card_index+=1
     let card = deck.splice(Math.floor(Math.random()*(deck.length)),1)
